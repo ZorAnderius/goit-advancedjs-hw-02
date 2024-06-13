@@ -82,7 +82,7 @@ function drawCountdown(time) {
             iziToast.success({
             message: "Countdown has finished. You can selected new time.",
             position: "topRight",
-            timeout: 2000
+            timeout: 5000
     })
         }
 
@@ -111,7 +111,7 @@ function resetDate() {
         iziToast.info({
             message: "Countdown was stopped. Select new time.",
             position: "topRight",
-            timeout: 2000
+            timeout: 5000
         });
 
         interval_id = -1;
