@@ -43,16 +43,16 @@ function handlerSubmit(e) {
  */
 function showPromises(position, delay) {
     createPromise(position, delay)
-      .then(res => {
+      .then(({position, delay}) => {
         iziToast.success({
           ...toastOption,
-          message: res,
+          message: `Fulfilled promise ${position} in ${delay}ms`,
           title: '✅'
         });
-      }).catch(rej => {
+      }).catch(({position, delay})  => {
         iziToast.error({
           ...toastOption,
-          message: rej,
+          message: `Rejected promise ${position} in ${delay}ms`,
           title: '❌'
         })
       });
@@ -69,9 +69,9 @@ function createPromise(position, delay) {
       setTimeout(() => {
         const shouldResolve = Math.random() > 0.3;
         if (shouldResolve) {
-          resolve(`Fulfilled promise ${position} in ${delay}ms`);
+          resolve({ position, delay });
         } else {
-          reject(`Rejected promise ${position} in ${delay}ms`);
+          reject({position, delay});
         }
       }, delay);
     });
