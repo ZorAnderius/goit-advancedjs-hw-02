@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Promise generator</title>
     
-    <script type="module" crossorigin src="/goit-advancedjs-hw-02/assets/modulepreload-polyfill-3cfb730f.js"></script>
-    <link rel="stylesheet" href="/goit-advancedjs-hw-02/assets/common-57480de7.css">
+    <script type="module" crossorigin src="/goit-advancedjs-hw-02/commonHelpers3.js"></script>
+    <link rel="modulepreload" crossorigin href="/goit-advancedjs-hw-02/assets/modulepreload-polyfill-3cfb730f.js">
+    <link rel="modulepreload" crossorigin href="/goit-advancedjs-hw-02/assets/vendor-77e16229.js">
+    <link rel="stylesheet" href="/goit-advancedjs-hw-02/assets/vendor-7a007824.css">
+    <link rel="stylesheet" href="/goit-advancedjs-hw-02/assets/common-1637eb5b.css">
   </head>
   <body>
     <p><a href="index.html">Go back</a></p>
@@ -14,15 +17,15 @@
     <form class="form">
       <label>
         First delay (ms)
-        <input type="number" name="delay" required />
+        <input type="number" name="delay" pattern="/-?\d+(\.\d+)?/g" required />
       </label>
       <label>
         Delay step (ms)
-        <input type="number" name="step" required />
+        <input type="number" name="step" pattern="/-?\d+(\.\d+)?/g" required />
       </label>
       <label>
         Amount
-        <input type="number" name="amount" required />
+        <input type="number" name="amount" pattern="/-?\d+(\.\d+)?/g" required />
       </label>
       <button type="submit">Create promises</button>
     </form>
