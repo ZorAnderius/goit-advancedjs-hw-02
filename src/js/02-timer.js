@@ -13,6 +13,7 @@ let interval_id = -1;
 let date = null;
 
 const options = {
+    theme:'dark',
     enableTime: true,
     time_24hr: true,
     defaultDate: new Date(),
@@ -20,33 +21,68 @@ const options = {
     onClose,
 };
 
+
+const stopIntervalOpts = {
+    theme: 'dark',
+    icon: 'icon-person',
+    title: 'Hey',
+    message: 'Do you want to stop current countdown and start new?',
+    position: 'center',
+    progressBarColor: 'rgb(0, 255, 184)',
+    buttons: [
+        ['<button data-ok>Ok</button>', okToast, true], 
+        ['<button>Close</button>', cancelToast]
+        ],
+}
+
 const fp = flatpickr(refs.calendar, options);
 
+
+/**
+ * check if selected date is valid and add listener 
+ * to start button or reset date when calendar closed
+ * 
+ * @param {Array} selectedDates of dates
+ * @returns undefined
+ */
 function onClose(selectedDates) {
-    if (date && date !== selectedDates[0]) {
-        resetDate();
-    }
+    if (date && date === selectedDates[0]){
+        return;
+    };
     if (selectedDates[0] < Date.now()) {
         iziToast.error({
             message: "Please choose a date in the future",
             position: "topRight",
             timeout: 2000
-    })
+            
+        })
     } else {
-        date = selectedDates[0];
-            refs.startBtn.disabled = false;
-            refs.startBtn.addEventListener('click', handlerStartCountdown);
+        if (date && date !== selectedDates[0]) {
+            iziToast.show(stopIntervalOpts);
+            return;
+        }
+        refs.startBtn.disabled = false;
+        refs.startBtn.addEventListener('click', handlerStartCountdown);
     }
 }
 
-function handlerStartCountdown(e) {
-    e.target.disabled = true;
+/**
+ * hendler event of click start button or when user wants to change date
+ * @param {event || null} e 
+ */
+function handlerStartCountdown(e = null) {
+    if(e) e.target.disabled = true;
     const [selectedDate] = refs.calendar._flatpickr.selectedDates;
+    date = selectedDate;
     const delta = selectedDate - Date.now();
     drawCountdown(convertMs(delta));
 }
 
-
+/**convert date from millisecond's format into days, hours, minutes and seconds format
+ * 
+ * @param {number} ms 
+ * @returns {Object}
+ */
 function convertMs(ms) {
 // Number of milliseconds per unit of time
 const second = 1000;
@@ -66,10 +102,21 @@ const minutes = Math.floor(((ms % day) % hour) / minute);
 return { days, hours, minutes, seconds };
 }
 
+/**convert numbers to string if number less then 10, so it needs to add 0 for begin,
+ * for example, '09' or '10'
+ * 
+ * @param {number} value 
+ * @returns {string}
+ */
 function addLeadingZero(value) {
     return value ? String(value).padStart(2, 0) : '00';
 }
 
+/**draw days, hours, minutes and seconds on the HTML
+ * and their changes every 1 second
+ * 
+ * @param {Object} time 
+ */
 function drawCountdown(time) {
     let { days, hours, minutes, seconds } = time;
     interval_id = setInterval(() => {
@@ -78,6 +125,7 @@ function drawCountdown(time) {
         if (!seconds && !minutes && !hours && !days) {
             clearInterval(interval_id);
             interval_id = -1;
+            date = null;
 
             iziToast.success({
             message: "Countdown has finished. You can selected new time.",
@@ -105,22 +153,47 @@ function drawCountdown(time) {
     }, 1000);
 }
 
+/**
+ * delete current interval, remove listener form StartBtn and redraw timer for '00'
+ */
 function resetDate() {
     if (~interval_id) {
         clearInterval(interval_id);
-        iziToast.info({
-            message: "Countdown was stopped. Select new time.",
-            position: "topRight",
-            timeout: 5000
-        });
-
         interval_id = -1;
         refs.startBtn.removeEventListener('click', handlerStartCountdown);
         refs.startBtn.disabled = true;
         refs.timerFields.forEach(field => field.textContent = addLeadingZero(0));
     }
-    
 }
 
+/**restart countdown when ok button was confirmed.
+ * 
+ * @param {Object} instance 
+ * @param {HTMLDivElement} toast 
+ */
+function okToast(instance, toast) {
+            resetDate();
+            iziToast.info({
+                        pauseOnHover: null,
+                        message: "Please, waiting for update timer",
+                        position: "center",
+                        overlay: true,
+                        timeout: 2000
+            });
+            handlerStartCountdown();
+            instance.hide({
+                transitionOut: 'fadeOutUp',
+            }, toast, 'buttonName');
+        }
 
+/**close Toast notification
+ * 
+ * @param {Object} instance 
+ * @param {HTMLDivElement} toast 
+ */
+function cancelToast(instance, toast) {
+            instance.hide({
+                transitionOut: 'fadeOutUp',
+            }, toast, 'buttonName');
+        }
 
