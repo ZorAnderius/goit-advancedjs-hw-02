@@ -50,6 +50,7 @@ function onClose(selectedDates) {
         return;
     };
     if (selectedDates[0] < Date.now()) {
+        refs.startBtn.disabled = true;
         iziToast.error({
             message: "Please choose a date in the future",
             position: "topRight",
