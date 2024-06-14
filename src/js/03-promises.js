@@ -8,7 +8,7 @@ form.addEventListener('submit', handlerSubmit);
 const toastOption = {
   icon: '',
   position: 'topRight',
-  timeout: 5000
+  timeout: 5000,
 }
 
 /**submit form and handler of data with show notification about create promises
@@ -18,7 +18,7 @@ const toastOption = {
  */
 function handlerSubmit(e) {
   e.preventDefault();
-  const [delay, steps, amount ] = [...e.target.elements].map(({value}) => !value.match('e') ? Number(value) : NaN);
+  const [delay, steps, amount ] = [...e.target.elements].map(({value}) => !value.match('e') ? +value : NaN);
   
   if (isNaN(delay) || isNaN(steps) || isNaN(amount)) {
     iziToast.error({
@@ -29,9 +29,9 @@ function handlerSubmit(e) {
     return;
   }
 
-  for (let i = 1; i <= amount; i += 1){
+  for (let i = 0; i < amount; i += 1){
     const totalDelay = delay + steps * i;
-    showPromises(i, totalDelay);
+    showPromises(i + 1, totalDelay);
   }
   form.reset();
 }
